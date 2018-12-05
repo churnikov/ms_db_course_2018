@@ -63,6 +63,7 @@ grant create table to &schema_name;
 grant create sequence to &schema_name;
 grant create view to &schema_name;
 grant create procedure to &schema_name;
+GRANT UNLIMITED TABLESPACE TO &schema_name;
 
 prompt user created...
 
