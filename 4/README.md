@@ -13,3 +13,22 @@ SQL> SELECT APPROX_COUNT_DISTINCT(EMBARKED) AS "Embarked" FROM TITANIC;
 ```
 
 ![Approx count example](approx_count_example.png)
+
+## Inline Functions
+```sql
+WITH
+FUNCTION CamCase(op VARCHAR2) RETURN VARCHAR2
+IS
+BEGIN
+  RETURN initcap(op);
+END;
+SELECT CamCase(SEX) FROM TITANIC
+```
+
+__No function applied__
+
+![No function applied](no_function_applied.png)
+
+__Function applied__
+
+![Function applied](function_applied.png)
