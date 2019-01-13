@@ -68,7 +68,42 @@ GRANT UNLIMITED TABLESPACE TO &schema_name;
 prompt user created...
 
 
+CREATE TABLE &schema_name.departments
+(
+dep_id  NUMBER(6) PRIMARY KEY,
+dep_name  VARCHAR(20)
+)
+ENABLE PRIMARY KEY USING INDEX
+TABLESPACE USERS;
+
+CREATE TABLE &schema_name.employees
+(
+employee_id  NUMBER(6) PRIMARY KEY,
+dep_id      NUMBER(6) NOT NULL,
+first_name  VARCHAR(20),
+last_name   VARCHAR(25),
+email       VARCHAR(25),
+sallary     NUMBER(8, 2)
+)
+ENABLE PRIMARY KEY USING INDEX
+TABLESPACE USERS;
+
+ALTER TABLE &schema_name.employees ADD CONSTRAINT emp_fk1
+FOREIGN KEY (dep_id) REFERENCES &schema_name.departments (dep_id);
+
+CREATE OR REPLACE FUNCTION &schema_name.my_random
+RETURN number IS rnd number;
+begin
+  select round(dbms_random.value(1,10)) into rnd from dual;
+  return a;
+end;
+/
+
+CREATE OR REPLACE VIEW &schema_name.employees_view AS
+SELECT employee_id, first_name, last_name, dep_name, my_random AS rnd
+FROM employees e
+INNER JOIN departments d ON e.dep_id = d.dep_id;
+
 -- user: nikita_develop
 -- pass: 1234
 -- Login with this user
-
