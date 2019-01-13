@@ -1,27 +1,15 @@
--- Дополнить скрипт из предыдущего задания (2) выдачей
--- достаточных системных привилегий создаваемому
--- пользователю-разработчику, создать объекты от имени
--- пользователя-разработчика (пару таблиц, пару процедур, пару
--- представлений), создать роль для пользователя приложения и
--- выдать этой роли привилегии на созданные объекты. Создать
--- пользователя приложения и убедиться, что объекты ему
--- доступны.
+# Задание 2-3
 
- REM
- REM                Version 0.01.0000
- REM             Database creation script
- REM
- REM      This script must be run under SYS account
- REM
+[Полный скрипт](3_user_creation_w_rights.sql)
 
-set verify off
+Модифицируйте скрипт создания пользователя, приведенный в
+примере. Добавьте в скрипт создание профиля с ограничениями
+на количество параллельных сеансов и время простоя.
+Организуйте привязку создаваемого пользователя к профилю.
 
-prompt Creating profile...
+__Создание профиля__
 
-accept profile_name prompt 'Please enter the name of the profile to generate: '
-accept profile_parallel prompt 'Please enter the limit of parallel profile sessions: '
-accept profile_max_idle_time prompt 'Please enter max idle time for profile: '
-
+```sql
 rem dropping the profile if already exists
 declare
         res number;
@@ -35,16 +23,11 @@ end;
 /
 
 create profile &profile_name limit IDLE_TIME &profile_max_idle_time SESSIONS_PER_USER &profile_parallel;
+```
 
-prompt profile created...
+__Создание пользователя__
 
-
-prompt Creating schema user...
-
-accept schema_name prompt 'Please enter the name of the schema to generate: '
-accept schema_password prompt 'Please enter the password of the schema: '
-accept oracle_service prompt 'Please enter the Oracle service name: '
-
+```sql
 rem dropping the user if already exists
 declare
         res number;
@@ -56,7 +39,20 @@ begin
         end if;
 end;
 /
+```
 
+Дополнить скрипт из предыдущего задания (2) выдачей
+достаточных системных привилегий создаваемому
+пользователю-разработчику, создать объекты от имени
+пользователя-разработчика (пару таблиц, пару процедур, пару
+представлений), создать роль для пользователя приложения и
+выдать этой роли привилегии на созданные объекты. Создать
+пользователя приложения и убедиться, что объекты ему
+доступны.
+
+__Выдача привелегий__
+
+```sql
 create user &schema_name identified by &schema_password PROFILE &profile_name;
 grant connect to &schema_name;
 grant create table to &schema_name;
@@ -64,9 +60,11 @@ grant create sequence to &schema_name;
 grant create view to &schema_name;
 grant create procedure to &schema_name;
 GRANT UNLIMITED TABLESPACE TO &schema_name;
+```
 
-prompt user created...
+__Создание объектов от имени создаваемого пользователя__
 
+```sql
 declare
 begin
 execute immediate 'ALTER SESSION SET CURRENT_SCHEMA = &schema_name';
@@ -108,7 +106,23 @@ CREATE OR REPLACE VIEW employees_view AS
 SELECT employee_id, first_name, last_name, dep_name, my_random AS rnd
 FROM employees e
 INNER JOIN departments d ON e.dep_id = d.dep_id;
+```
 
--- user: nikita_develop
--- pass: 1234
--- Login with this user
+__Создаем пользователя__
+
+```bash
+$ sqlplus system/password 3_user_creation_w_rights.sql
+```
+
+Результат
+
+![user_created](user_created.png)
+![user_created](user_created_1.png)
+
+Объекты созданы:
+
+![everything_created](everything_created.png)
+
+Есть доступ
+
+![can_access](can_access.png)
